@@ -1,0 +1,78 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   i18n_domain="zojax.personal.profile">
+
+  <!-- layout -->
+  <zojax:layout
+     name="workspace"
+     layout="workspace"
+     for="..interfaces.IProfileWorkspace"
+     template="layout.pt" />
+
+  <zojax:layout
+     layout="workspace"
+     for="zojax.preferences.interfaces.IRootPreferences"
+     template="layoutcontent.pt" />
+
+  <!-- portlet managers -->
+  <zojax:portletManager
+     name="columns.left"
+     title="Profile left column"
+     for="..interfaces.IProfileWorkspace"
+     class="zojax.personal.space.portletmanager.PortletManager"
+     portlettype="zojax.personal.space.interfaces.IPersonalWorkspacePortlet" />
+
+  <zojax:portletManager
+     name="columns.right"
+     title="Profile right column"
+     for="..interfaces.IProfileWorkspace"
+     schema=".interfaces.IPersonalProfilePortletManager"
+     class="zojax.personal.space.portletmanager.PortletManager" 
+     portlettype="zojax.personal.space.interfaces.IPersonalWorkspacePortlet" />
+
+  <!-- portlets -->
+  <zojax:portlet
+     title="Profile"
+     name="workspace.profile.settings"
+     for="..interfaces.IProfileWorkspace"
+     class=".actions.ProfileActions"
+     type="zojax.personal.space.interfaces.IPersonalWorkspacePortlet" />
+
+  <!-- view profile -->
+  <browser:defaultView
+     name="index.html"
+     for="..interfaces.IProfileWorkspace" />
+
+  <zojax:pagelet
+     name="index.html"
+     class=".profile.ProfileView"
+     template="profile.pt"
+     for="..interfaces.IProfileWorkspace"
+     permission="zope.Public" />
+
+  <zojax:pagelet
+     name="profileQuickInfo"
+     template="quickinfo.pt"
+     for=".profile.ProfileView"
+     class=".quickinfo.QuickInfo" />
+
+  <zojax:pageelement
+     name="profile.title"
+     for="..interfaces.IProfileWorkspace"
+     provides=".interfaces.IPersonalProfileTitle" />
+
+  <!-- icons -->
+  <browser:icon
+     name="zmi_icon"
+     file="profile.png"
+     for="..interfaces.IProfileWorkspaceFactory" />
+
+  <!-- styles -->
+  <zojax:resourceinclude
+     name="zojax-personal-profile.css"
+     library="zojax"
+     type="stylesheet" file="styles.css" filetype="zrt" />
+
+</configure>

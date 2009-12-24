@@ -1,0 +1,475 @@
+=============
+Browser tests
+=============
+
+    >>> from zope import component, interface, event
+    >>> from zope.testbrowser.testing import Browser
+    >>> from zope.lifecycleevent import ObjectCreatedEvent
+    >>> from zope.app.component.hooks import setSite
+    >>> from zope.app.intid import IntIds
+    >>> from zope.app.intid.interfaces import IIntIds
+    >>> from zope.app.testing.functional import getRootFolder
+    >>> from zope.app.security.interfaces import IAuthentication
+    >>> from zojax.catalog.catalog import Catalog
+    >>> from zojax.catalog.interfaces import ICatalog
+    >>> from zojax.controlpanel.interfaces import IConfiglet
+    >>> from zojax.activity.interfaces import IActivityAware
+    >>> from zojax.principal.profile.interfaces import IPersonalProfile
+    >>> from zojax.personal.space.manager import PersonalSpaceManager
+    >>> from zojax.personal.space.interfaces import IPersonalSpaceManager
+    >>> from zojax.personal.profile import interfaces
+
+    >>> root = getRootFolder()
+    >>> setSite(root)
+
+    >>> root['ids'] = IntIds()
+    >>> root.getSiteManager().registerUtility(root['ids'], IIntIds)
+    >>> id = root['ids'].register(root)
+
+    >>> root['catalog'] = Catalog()
+    >>> root.getSiteManager().registerUtility(root['catalog'], ICatalog)
+
+    >>> interface.alsoProvides(root, IActivityAware)
+
+    >>> authConfiglet = component.getUtility(IConfiglet,'system.authentication')
+    >>> authConfiglet.installUtility()
+    >>> authConfiglet.installPrincipalRegistry()
+
+Create home folder manager
+
+    >>> manager = PersonalSpaceManager(title=u'People')
+    >>> event.notify(ObjectCreatedEvent(manager))
+
+    >>> root['people'] = manager
+    >>> root.getSiteManager().registerUtility(root['people'], IPersonalSpaceManager)
+
+Browsers
+
+    >>> admin = Browser()
+    >>> admin.addHeader("Authorization", "Basic mgr:mgrpw")
+    >>> admin.handleErrors = False
+
+    >>> user = Browser()
+    >>> user.addHeader("Authorization", "Basic user:userpw")
+    >>> user.handleErrors = False
+
+    >>> anon = Browser()
+    >>> anon.handleErrors = False
+
+
+Principal events
+----------------
+
+    >>> from zope.app.security.interfaces import IAuthentication
+    >>> from zojax.principal.registration.interfaces import PrincipalRegisteredEvent
+    >>> auth = component.getUtility(IAuthentication)
+    >>> principal = auth.getPrincipal('zope.user')
+    >>> profile = IPersonalProfile(principal)
+
+Principal registration event
+
+    >>> event.notify(PrincipalRegisteredEvent(principal))
+
+Principal login event
+
+    >>> from zojax.authentication.interfaces import PrincipalLoggedInEvent
+    >>> event.notify(PrincipalLoggedInEvent(principal))
+
+
+Categories
+----------
+
+    >>> admin.open("http://localhost/settings/")
+    >>> admin.getLink('User profiles').click()
+    >>> admin.getLink('Profile Fields').click()
+    >>> admin.getLink('Field categories').click()
+
+    >>> admin.getControl(name='form.widget.category').value = 'Category1'
+    >>> admin.getControl(name='form.button.add').click()
+    >>> admin.getControl(name='form.widget.category').value = 'Category2'
+    >>> admin.getControl(name='form.button.add').click()
+    >>> admin.getControl(name='form.widget.category').value = 'Category3'
+    >>> admin.getControl(name='form.button.add').click()
+
+Simple field
+------------
+
+    >>> admin.getLink('Profile Fields').click()
+    >>> admin.getLink('Text Line').click()
+    >>> admin.getControl('Title').value = u'Field 1'
+    >>> admin.getControl(name="content.add.widgets.required:list").value = ['false']
+    >>> admin.getControl(name="content.add.widgets.category:list").value = ['Category1']
+    >>> admin.getControl("Content short name").value = 'field1'
+    >>> admin.getControl(name="content.add.buttons.add").click()
+    >>> admin.getControl(name="content.edit.buttons.cancel").click()
+
+Check field
+
+    >>> user.open("http://localhost/people/")
+    >>> user.getLink('Personal space').click()
+    >>> user.getLink('Edit Profile').click()
+    >>> user.getControl('Field 1').value = 'field 1 value'
+    >>> user.getControl('Save').click()
+
+    >>> profile.getProfileData()['field1']
+    u'field 1 value'
+
+View profile
+
+    >>> user.open("http://localhost/people/user/profile/")
+    >>> print user.contents
+    <html>
+    ...
+    <h3 class="z-form-grouplabel">Category1</h3>
+    <div class="z-form-fieldset">
+       <div class="z-form-field">
+         <label for="form-widgets-field1"...>Field 1</label>
+         <div>
+           <span id="form-widgets-field1"
+             class="text-widget textline-field">field 1 value</span>
+         </div>
+       </div>
+    </div>
+    ...
+    </html>
+
+
+Anonymous view
+
+    >>> anon.open("http://localhost/people/user/profile/")
+    >>> print anon.contents
+    <html>
+    ...
+    <h3 class="z-form-grouplabel">Category1</h3>
+    <div class="z-form-fieldset">
+       <div class="z-form-field">
+         <label for="form-widgets-field1"...>Field 1</label>
+         <div>
+           <span id="form-widgets-field1"
+             class="text-widget textline-field">field 1 value</span>
+         </div>
+       </div>
+    </div>
+    ...
+    </html>
+
+
+Not visible field
+-----------------
+
+    >>> admin.getLink('Profile Fields').click()
+    >>> admin.getLink('Text Line').click()
+    >>> admin.getControl('Title').value = u'Field 2'
+    >>> admin.getControl(name="content.add.widgets.required:list").value = ['false']
+    >>> admin.getControl(name="content.add.widgets.category:list").value = ['Category2']
+    >>> admin.getControl(name="content.add.widgets.visible:list").value = ['false']
+    >>> admin.getControl("Content short name").value = 'field2'
+    >>> admin.getControl(name="content.add.buttons.add").click()
+    >>> admin.getControl(name="content.edit.buttons.cancel").click()
+
+    >>> user.open("http://localhost/people/user/profile/profile/")
+
+Can edit
+
+    >>> user.getControl('Field 2').value = 'field 2 value'
+    >>> user.getControl('Save').click()
+    >>> profile.getProfileData()['field2']
+    u'field 2 value'
+
+But not visible in profile view
+
+    >>> user.open("http://localhost/people/user/profile/")
+    >>> 'Field 2' not in user.contents
+    True
+
+
+Editable field
+--------------
+
+    >>> admin.getLink('Profile Fields').click()
+    >>> admin.getLink('Text Line').click()
+    >>> admin.getControl('Title').value = u'Field 3'
+    >>> admin.getControl(name="content.add.widgets.required:list").value = ['false']
+    >>> admin.getControl(name="content.add.widgets.editable:list").value = ['false']
+    >>> admin.getControl("Content short name").value = 'field3'
+    >>> admin.getControl(name="content.add.buttons.add").click()
+    >>> admin.getControl(name="content.edit.buttons.cancel").click()
+
+Field is not editable by user
+
+    >>> user.open("http://localhost/people/user/profile/profile/")
+    >>> 'Field 3' not in user.contents
+    True
+
+Admin can change field
+
+    >>> admin.open("http://localhost/people/user/profile/profile/")
+    >>> admin.getControl('Field 3').value = 'field 3 value'
+    >>> admin.getControl('Save').click()
+
+    >>> profile.getProfileData()['field3']
+    u'field 3 value'
+
+But user can see this field
+
+    >>> user.open("http://localhost/people/user/profile/")
+    >>> print user.contents
+    <html>
+    ...
+    <label for="form-widgets-field3"...>Field 3</label>
+    <div>
+       <span id="form-widgets-field3"
+        class="text-widget textline-field">field 3 value</span>
+    </div>
+    ...
+    </html>
+
+Anonymous also
+
+    >>> anon.open("http://localhost/people/user/profile/")
+    >>> print anon.contents
+    <html>
+    ...
+    <label for="form-widgets-field3"...>Field 3</label>
+    <div>
+      <span id="form-widgets-field3"
+        class="text-widget textline-field">field 3 value</span>
+    </div>
+    ...
+    </html>
+
+
+Quick fields
+------------
+
+    >>> user.open('http://localhost/people/user/profile/')
+    >>> print user.contents
+    <html>
+    ...
+    <div class="z-ws-profile-quickinfo">
+      <table>
+        <tr>
+          <td class="quickinfo-title">Member Since:</td>
+          <td>...</td>
+        </tr>
+        <tr>
+          <td class="quickinfo-title">Last Logged In:</td>
+          <td>...</td>
+        </tr>
+      </table>
+    </div>
+    ...
+    </html>
+
+Add fields to quick info
+
+    >>> from zojax.principal.profile.interfaces import IProfilesCategory
+    >>> category = component.getUtility(IProfilesCategory)
+    >>> id = list(IProfilesCategory['quickInfoFields'].bind(category).value_type.vocabulary)[0].value
+    >>> component.getUtility(IProfilesCategory).quickInfoFields = [id]
+
+    >>> user.open('http://localhost/people/user/profile/')
+    >>> print user.contents
+    <html>
+    ...
+    <div class="z-ws-profile-quickinfo">
+      <table>
+        <tr>
+          <td class="quickinfo-title">Member Since:</td>
+          <td>...</td>
+        </tr>
+        <tr>
+          <td class="quickinfo-title">Last Logged In:</td>
+          <td>...</td>
+        </tr>
+        <tr>
+          <td class="quickinfo-title">
+             Field 1:</td>
+          <td>
+            <span id="form-widgets-field1"
+             class="text-widget textline-field">field 1 value</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    ...
+    </html>
+
+
+Activity
+--------
+
+    >>> from zojax.activity.interfaces import IActivity
+    >>> activity = root.getSiteManager().getUtility(IActivity)
+    >>> activity.removeObject(root)
+
+    >>> list(activity.search(type={'any_of': ('registration',)}))
+    []
+
+    >>> principal = auth.getPrincipal('zope.user')
+    >>> event.notify(PrincipalRegisteredEvent(principal))
+
+    >>> rec = list(activity.search(type={'any_of': ('registration',)}))[0]
+    >>> rec.principal
+    'zope.user'
+
+    >>> from zojax.authentication.interfaces import PrincipalRemovingEvent
+    >>> event.notify(PrincipalRemovingEvent(principal))
+
+    >>> list(activity.search(type={'any_of': ('registration',)}))
+    []
+
+
+Login action
+------------
+
+Special success login action that redirects to profile edit form on
+first login
+
+    >>> from zojax.principal.profile.interfaces import IPersonalProfile
+
+    >>> profile = IPersonalProfile(principal)
+    >>> profile.modified is None
+    True
+
+    >>> user = Browser()
+    >>> user.handleErrors = False
+    >>> user.open("http://localhost/login.html")
+    >>> user.getControl('Login Name').value = 'user'
+    >>> user.getControl('Password').value = 'userpw'
+    >>> user.getControl('Log in').click()
+
+    >>> user.url
+    'http://localhost/people/user/profile/profile/'
+    
+    >>> user.getControl(name="form.widgets.timezone:list").value=[u'US/Central']
+    >>> user.getControl(name="form.buttons.save").click()
+
+
+Portlets managers for profile workspace
+
+    >>> admin.open("http://localhost/people/context.html/presentation/")
+    >>> print admin.contents
+    <html>
+    ...
+    <h2>Personal Space Portlets Configuration</h2>
+    <div class="z-form-fieldset">
+       <h3>Profile</h3>
+       <div class="z-page-description"></div>
+       <ul class="z-listing">
+          <li>
+            <a href="http://localhost/people/context.html/presentation/ppm-profile-columns.left/">Profile left column</a>
+            <div class="byline"></div>
+          </li> <li>
+            <a href="http://localhost/people/context.html/presentation/ppm-profile-columns.right/">Profile right column</a>
+            <div class="byline"></div>
+          </li>
+       </ul>
+    </div>
+    ...
+    </html>
+
+
+Registration notifications
+
+    >>> from zojax.personal.profile.tests.tests import Principal
+
+    >>> p1 = Principal('zope.user', 'User')
+    >>> event.notify(ObjectCreatedEvent(p1))
+    >>> root['p1'] = p1
+    
+    >>> p2 = Principal('zope.mgr', 'Manager')
+    >>> event.notify(ObjectCreatedEvent(p2))
+    >>> root['p2'] = p2
+
+    >>> admin.open("http://localhost/settings/")
+    >>> admin.getLink('Portal registration').click()
+    >>> admin.getLink('Notifications').click()
+
+    >>> admin.getControl('Select').click()
+
+    >>> 'Please select user' in admin.contents
+    True
+
+    >>> admin.getControl(name="notifications.widgets.principal").value = ['zope.mgr']
+    >>> admin.getControl('Select').click()
+
+    >>> 'User has been subscribed.' in admin.contents
+    True
+
+
+    >>> from zojax.mail.interfaces import IMailAddress
+    >>> try:
+    ...     from zope.principalregistry import principalregistry
+    ... except:
+    ...     from zope.app.security import principalregistry
+    
+    >>> class simpleMailAddress(object):
+    ...     interface.implements(IMailAddress)
+    ...     component.adapts(principalregistry.Principal)
+    ...     
+    ...     address = 'user@zojax.net'
+    ...     
+    ...     def __init__(self, principal):
+    ...         pass
+
+    >>> component.getGlobalSiteManager().registerAdapter(simpleMailAddress)
+
+    >>> emails = []
+    >>> def send(self, fromaddr, toaddr, message):
+    ...     emails.append((fromaddr, toaddr, message))
+    >>> def getEMails(clear=True):
+    ...     global emails
+    ...     m = list(emails)
+    ...     if clear:
+    ...         emails = []
+    ...         return m
+
+    >>> from zope.sendmail.mailer import SMTPMailer
+    >>> oldSend = SMTPMailer.send
+    >>> SMTPMailer.send = send
+
+    >>> from zope.publisher.browser import TestRequest
+    >>> from zope.security.management import newInteraction, endInteraction
+
+    >>> request = TestRequest()
+    >>> request.setPrincipal(auth.getPrincipal('zope.mgr'))
+    >>> newInteraction(request)
+
+    >>> from zojax.principal.registration.interfaces import PrincipalRegisteredEvent
+
+    >>> auth = component.getUtility(IAuthentication)
+    >>> event.notify(PrincipalRegisteredEvent(auth.getPrincipal('zope.user')))
+
+    >>> from email import message_from_string, quopriMIME
+
+    >>> message = message_from_string(emails[-1][2])
+
+    >>> message['subject']
+    'New principal has been registered: User'
+
+    >>> msg = message.get_payload(decode=1)
+    >>> print msg
+    <h2>New user has been registered.</h2>
+    <br />
+    User:&nbsp;&nbsp; "<a href="http://127.0.0.1/people/user/">User</a>"
+    <br />
+    Date:&nbsp;&nbsp; ...
+    <br /><br />
+    <hr />
+    <div>
+      Site: <a href="http://127.0.0.1/"></a>
+    </div>
+
+    >>> endInteraction()
+
+    >>> admin.getControl(name="form.principals:list").value = ['zope.mgr']
+    >>> admin.getControl('Unsubscribe').click()
+
+    >>> 'Selected users have been unsubscribed.' in admin.contents
+    True
+
+Clean up
+
+    >>> SMTPMailer.send = oldSend
+    >>> setSite(None)

@@ -1,0 +1,22 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zcml="http://namespaces.zope.org/zcml"
+   zcml:condition="installed zojax.content.activity"
+   i18n_domain="zojax.personal.profile">
+
+  <class class=".activity.PrincipalRegisteredActivityRecord">
+    <require
+       permission="zope.Public"
+       interface=".interfaces.IPrincipalRegisteredActivityRecord
+		  zojax.activity.interfaces.IActivityRecord" />
+  </class>
+
+  <utility
+     name="registration"
+     factory=".activity.PrincipalRegisteredActivityRecordDescription" />
+
+  <subscriber handler=".activity.principalRemovingHandler" />
+
+  <subscriber handler=".activity.principalRegisteredHandler" />
+
+</configure>

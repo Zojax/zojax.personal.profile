@@ -1,0 +1,26 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   i18n_domain="zojax.personal.profile">
+
+  <!-- email notification -->
+  <zojax:pagelet
+     name="notifications"
+     type="wizard.step"
+     title="Notifications"
+     for="zojax.principal.registration.interfaces.IPortalRegistration
+	  zojax.controlpanel.browser.interfaces.IConfigletEditWizard"
+     template="notifications.pt"
+     class=".notifications.NotificationsForm"
+     weight="200" />
+
+  <zojax:mailtemplate
+     for="* zojax.principal.registration.interfaces.IPrincipalRegisteredEvent"
+     contentType="text/html"
+     template="template.pt"
+     class=".template.NotificationMail"
+     provides="zojax.content.notifications.interfaces.INotificationMailTemplate"
+     />
+
+</configure>
