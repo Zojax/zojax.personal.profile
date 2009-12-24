@@ -1,0 +1,3 @@
+<div class="z-prefs-content" tal:content="structure view/render">
+  [rendered body]
+</div>

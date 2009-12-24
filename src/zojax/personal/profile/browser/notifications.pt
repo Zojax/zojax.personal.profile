@@ -1,0 +1,20 @@
+<h2>E-Mail notifications</h2>
+<br />
+
+<div class="z-form-fieldset" tal:condition="view/principals">
+  <h3>Subscribed principals</h3>
+  <ul class="z-listing">
+    <li tal:repeat="principal view/principals">
+      <input type="checkbox" name="form.principals:list"
+	     tal:attributes="value principal/id" />
+      <tal:block content="principal/title" />
+    </li>
+  </ul>
+  <br />
+  <hr />
+  <input class="z-form-button"
+	 type="submit" name="form.unsubscribe" value="Unsubscribe" />
+</div>
+
+<tal:block content="structure view/@@pagelet/form" />
+

@@ -1,0 +1,17 @@
+<h2>New user has been registered.</h2>
+<br />
+
+User:&nbsp;&nbsp; "<a tal:content="view/author" tal:omit-tag="not:view/space"
+	  tal:attributes="href view/space"></a>"
+<br />
+Date:&nbsp;&nbsp; <tal:block content="structure formatter:dateTime,medium:view/now" />
+<tal:block condition="view/email">
+<br />
+EMail:&nbsp; <tal:block content="view/email"/>
+</tal:block>
+<br /><br />
+<hr />
+<div>
+  Site: <a tal:attributes="href string:${view/context/@@absolute_url}/"
+	   tal:content="view/context/title|view/context/__name__"></a>
+</div>

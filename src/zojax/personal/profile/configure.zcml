@@ -1,0 +1,29 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   i18n_domain="zojax.personal.profile">
+
+  <!-- profile workspace factory -->
+  <adapter
+     name="profile"
+     factory=".workspace.ProfileWorkspaceFactory" />
+
+  <utility
+     name="profile"
+     factory=".workspace.ProfileWorkspaceDescription" />
+
+  <!-- login action -->
+  <adapter
+     name="personal.profile"
+     factory=".login.SuccessLoginAction" />
+
+  <!-- activity -->
+  <include file="activity.zcml" />
+
+  <!-- email notifications -->
+  <include file="notifications.zcml" />
+
+  <!-- browser views -->
+  <include package=".browser" />
+
+</configure>

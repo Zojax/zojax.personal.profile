@@ -1,0 +1,65 @@
+/* zrt-cssregistry: */
+
+@media all { 
+
+  #z-ws-profile .z-prefs-content .z-form,
+  #z-ws-profile .z-prefs-content .z-form-edit {
+    border: borderWidth borderStyle globalBorderColor;
+    padding: 1em;
+    margin-top: 0em;
+    margin-bottom: 1em;
+  }
+
+  #z-ws-profile .z-prefs-content .z-form-group { 
+    background-color: transparent;
+  }
+
+  #z-ws-profile .z-ws-profile-userinfo { 
+    margin-left: 2em;
+  }
+
+  #z-ws-profile .z-ws-profile-userinfo a { 
+    text-decoration: none;
+  }
+
+  #z-ws-profile .z-ws-profile-quickinfo {
+    padding-top: 1em;
+    padding-left: 2em;
+  }
+
+  #z-ws-profile .z-ws-profile-quickinfo table {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #z-ws-profile .z-ws-profile-quickinfo td { 
+    padding-bottom: 0.5em;
+  }
+
+  #z-ws-profile .z-ws-profile-quickinfo .quickinfo-title { 
+    text-align: right;
+    white-space: nowrap;
+    color: discreetColor;
+    padding-right: 0.5em;
+  }
+
+  #z-ws-profile .z-quickinfo { 
+    margin-bottom: 2em;
+  }
+
+  #z-ws-profile .z-quickinfo .z-user-title { 
+    font-size: 150%;
+    margin-left: 2em;
+    border-bottom: borderWidth dotted globalBorderColor;
+  }
+
+  #z-ws-profile .z-quickinfo tr {
+    vertical-align: top;
+  }
+
+  #z-ws-profile .z-user-image img {
+    padding: 4px;
+    border: 1px solid globalBorderColor;
+  }
+
+}

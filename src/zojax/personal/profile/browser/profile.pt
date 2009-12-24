@@ -1,0 +1,17 @@
+<table class="z-quickinfo">
+  <tr>
+    <td class="z-user-image">
+      <img tal:attributes="src view/photoUrl" />
+    </td>
+    <td tal:define="ptitle pageelement:profile.title">
+      <span class="z-user-title" tal:content="view/title"></span>
+      <div class="z-ws-profile-userinfo" 
+	   tal:condition="ptitle" tal:content="structure ptitle" />
+      <tal:block tal:define="view nocall:view/@@profileQuickInfo;
+			     dummy view/update"
+		 tal:content="structure view/render" />
+    </td>
+  </tr>
+</table>
+
+<tal:block content="structure view/@@pagelet/form" />
