@@ -40,7 +40,7 @@ class SuccessLoginAction(object):
     def __call__(self, nextURL):
         profile = IPersonalProfile(self.principal)
 
-        if profile.modified is None:
+        if not profile.isComplete():
             if profile.firstname and profile.lastname:
                 profile.modified = parseDatetimetz(str(datetime.datetime.now()))
 
