@@ -17,6 +17,7 @@ $Id$
 """
 from zope import interface
 from zope.component import getUtility, getMultiAdapter
+from zope.app.intid.interfaces import IIntIds
 
 from z3c.form.group import Group
 from z3c.form.interfaces import DISPLAY_MODE, IDisplayForm
@@ -40,7 +41,7 @@ class ProfileView(PageletDisplayForm):
 
     def updateForms(self):
         super(ProfileView, self).updateForms()
-
+        ids = getUtility(IIntIds)
         fields = getUtility(IProfileFields).getFields()
 
         content = self.profile.getProfileData()
@@ -52,7 +53,7 @@ class ProfileView(PageletDisplayForm):
         categories = {}
         for field in fields:
             name = field.__name__
-            if not field.visible or name in quickInfo:
+            if not field.visible or ids.getId(field) in quickInfo:
                 continue
 
             value = content.get(name, field.missing_value)
