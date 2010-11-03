@@ -20,6 +20,8 @@ from zope import interface, component
 from zope.datetime import parseDatetimetz
 from zope.traversing.browser import absoluteURL
 from zope.security.interfaces import IPrincipal
+from zope.security import checkPermission
+from zope.app.component.hooks import getSite
 from zojax.statusmessage.interfaces import IStatusMessage
 from zojax.principal.profile.interfaces import IPersonalProfile
 from zojax.authentication.interfaces import ISuccessLoginAction
@@ -40,7 +42,7 @@ class SuccessLoginAction(object):
     def __call__(self, nextURL):
         profile = IPersonalProfile(self.principal)
 
-        if not profile.isComplete():
+        if not profile.isComplete() and checkPermission('zojax.PersonalSpace', getSite()):
             if profile.firstname and profile.lastname:
                 profile.modified = parseDatetimetz(str(datetime.datetime.now()))
 
