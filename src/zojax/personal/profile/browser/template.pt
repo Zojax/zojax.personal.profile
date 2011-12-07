@@ -1,13 +1,17 @@
-<h2>New user has been registered.</h2>
+<h2 i18n:translate="">New user has been registered.</h2>
 <br />
-
+<tal:block i18n:translate="">
 User:&nbsp;&nbsp; "<a tal:content="view/author" tal:omit-tag="not:view/space"
+	  i18n:name="autor"
 	  tal:attributes="href view/space"></a>"
+</tal:block>
 <br />
-Date:&nbsp;&nbsp; <tal:block content="structure formatter:dateTime,medium:view/now" />
-<tal:block condition="view/email">
+<tal:block i18n:translate="">
+Date:&nbsp;&nbsp; <tal:block i18n:name="date" content="structure formatter:dateTime,medium:view/now" />
+</tal:block>
+<tal:block i18n:translate="" condition="view/email">
 <br />
-EMail:&nbsp; <tal:block content="view/email"/>
+EMail:&nbsp; <tal:block i18n:name="email" content="view/email"/>
 </tal:block>
 <br /><br />
 <hr />

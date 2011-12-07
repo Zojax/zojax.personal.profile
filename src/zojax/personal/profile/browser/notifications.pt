@@ -1,8 +1,8 @@
-<h2>E-Mail notifications</h2>
+<h2 i18n:translate="">E-Mail notifications</h2>
 <br />
 
 <div class="z-form-fieldset" tal:condition="view/principals">
-  <h3>Subscribed principals</h3>
+  <h3 i18n:translate="">Subscribed principals</h3>
   <ul class="z-listing">
     <li tal:repeat="principal view/principals">
       <input type="checkbox" name="form.principals:list"
@@ -13,6 +13,7 @@
   <br />
   <hr />
   <input class="z-form-button"
+         i18n:attributes="value"
 	 type="submit" name="form.unsubscribe" value="Unsubscribe" />
 </div>
 

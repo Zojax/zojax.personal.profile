@@ -1,15 +1,15 @@
 <div class="z-ws-profile-quickinfo">
   <table>
     <tr tal:condition="view/registered">
-      <td class="quickinfo-title">Member Since:</td>
+      <td class="quickinfo-title" i18n:translate="">Member Since:</td>
       <td tal:content="structure formatter:date,full:view/registered"></td>
     </tr>
     <tr tal:condition="view/lastLoginTime">
-      <td class="quickinfo-title">Last Logged In:</td>
+      <td class="quickinfo-title" i18n:translate="">Last Logged In:</td>
       <td tal:content="structure formatter:dateTime,medium:view/lastLoginTime"></td>
     </tr>
     <tr tal:condition="view/timezone">
-      <td class="quickinfo-title">Timezone:</td>
+      <td class="quickinfo-title" i18n:translate="">Timezone:</td>
       <td tal:content="view/timezone"></td>
     </tr>
     <tr tal:repeat="widget view/widgets/values">
