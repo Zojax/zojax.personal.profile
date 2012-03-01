@@ -1,0 +1,36 @@
+# ############################################################################
+# Copyright (c) 2003-2004 Zope Corporation and Contributors.
+# All Rights Reserved.
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+# ############################################################################
+# 阿佛坨 <frend.wang@gmail.com>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Development/Unknown\n"
+"POT-Creation-Date: Thu Dec  8 23:11:40 2011\n"
+"PO-Revision-Date: 2012-02-25 15:07+0800\n"
+"Last-Translator: 阿佛坨 <frend.wang@gmail.com>\n"
+"Language-Team: LIG\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Virtaal 0.7.1\n"
+"Generated-By: zope/app/locales/extract.py\n"
+
+#: src/zojax/personal/profile/workspace.py:34
+msgid "Personal Profile"
+msgstr "个人档案"
+
+#: src/zojax/personal/profile/workspace.py:45
+#: src/zojax/personal/profile/workspace.py:68
+#: src/zojax/personal/profile/workspace.py:77
+#: src/zojax/personal/profile/browser/configure.zcml:36
+msgid "Profile"
+msgstr "档案"
