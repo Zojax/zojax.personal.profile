@@ -382,10 +382,7 @@ Registration notifications
     >>> event.notify(ObjectCreatedEvent(p2))
     >>> root['p2'] = p2
 
-    >>> admin.open("http://localhost/settings/")
-    >>> admin.getLink('Portal registration').click()
-    >>> admin.getLink('Notifications').click()
-
+    >>> admin.open("http://localhost/settings/principals/registration/index.html/notifications/")
     >>> admin.getControl('Select').click()
 
     >>> 'Please select user' in admin.contents
